@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<idea-plugin>
+    <id>com.javaqualitychecker.plugin</id>
+    <name>Java Code Quality Checker</name>
+    <vendor email="your@email.com">YourName</vendor>
+
+    <description><![CDATA[
+        Java Code Quality Checker - Spell Check, Naming and Readability.
+        FREE with Google Gemini. Press Alt+Shift+Q on any Java file.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="Java Code Quality Checker"
+                           displayType="BALLOON"
+                           isLogByDefault="true"/>
+        <applicationService
+            serviceImplementation="com.codereview.plugin.model.ReviewResultStore"/>
+        <applicationService
+            serviceImplementation="com.codereview.plugin.settings.ReviewSettings"/>
+        <applicationConfigurable
+            parentId="tools"
+            instance="com.codereview.plugin.settings.ReviewConfigurable"
+            id="com.javaqualitychecker.plugin.settings"
+            displayName="Java Code Quality Checker"/>
+        <toolWindow id="Code Quality"
+                    anchor="right"
+                    factoryClass="com.codereview.plugin.ui.ReviewToolWindowFactory"/>
+        <externalAnnotator
+            language="JAVA"
+            implementationClass="com.codereview.plugin.annotator.ReviewAnnotator"/>
+    </extensions>
+
+    <actions>
+        <group id="JavaQualityCheckerGroup"
+               text="Java Quality Checker"
+               popup="true">
+            <add-to-group group-id="AnalyzeMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </group>
+
+        <action id="com.javaqualitychecker.CheckQualityAction"
+                class="com.codereview.plugin.actions.ReviewAction"
+                text="Check Java Code Quality"
+                description="Check spelling, naming, readability and bugs - FREE with Gemini">
+            <add-to-group group-id="JavaQualityCheckerGroup" anchor="first"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift Q"/>
+        </action>
+
+        <action id="com.javaqualitychecker.ClearQualityAction"
+                class="com.codereview.plugin.actions.ClearReviewAction"
+                text="Clear Quality Highlights"
+                description="Clear all quality check highlights for this file">
+            <add-to-group group-id="JavaQualityCheckerGroup" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift X"/>
+        </action>
+    </actions>
+</idea-plugin>
