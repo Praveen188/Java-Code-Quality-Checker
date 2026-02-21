@@ -1,13 +1,15 @@
 package com.codereview.plugin.actions;
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.codereview.plugin.model.ReviewResultStore;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Clears review results for the current file — Alt+Shift+C
+ * Clears review results for the current file - Alt+Shift+X
  */
 public class ClearReviewAction extends AnAction {
 
@@ -25,12 +27,15 @@ public class ClearReviewAction extends AnAction {
 
         ReviewResultStore.getInstance().clear(filePath);
 
-        // Trigger re-annotation (clear highlights)
-        com.intellij.openapi.application.ApplicationManager.getApplication()
-            .invokeLater(() -> {
-                com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
-                    .getInstance(project).restart(psiFile);
-            });
+        // Re-run the annotator on this specific file to clear highlights.
+        // Uses restart(PsiFile) - targeted, non-deprecated, precise.
+        // Avoids the broad restart() which is deprecated in 2025.3+.
+        final PsiFile fileRef = psiFile;
+        ApplicationManager.getApplication().invokeLater(() -> {
+            if (!project.isDisposed() && fileRef.isValid()) {
+                DaemonCodeAnalyzer.getInstance(project).restart(fileRef);
+            }
+        });
     }
 
     @Override

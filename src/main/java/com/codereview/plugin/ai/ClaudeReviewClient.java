@@ -6,7 +6,6 @@ import com.codereview.plugin.model.ReviewResult;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +116,8 @@ public class ClaudeReviewClient {
     }
 
     private HttpURLConnection openConnection() throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) new URL(API_URL).openConnection();
+        HttpURLConnection conn = (HttpURLConnection)
+            java.net.URI.create(API_URL).toURL().openConnection();
         conn.setRequestMethod("POST");
         conn.setConnectTimeout(TIMEOUT_MS);
         conn.setReadTimeout(TIMEOUT_MS);
